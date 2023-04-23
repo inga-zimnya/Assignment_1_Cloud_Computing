@@ -75,13 +75,20 @@ def authorize():
     name = db.users.find_one({"username": username, "password": password})
 
     if name:
-        res = make_response("Setting a cookie")
+        res = make_response(jsonify({"status": "success", "redirect_url": authorized()}))
         res.set_cookie('username', username, max_age=60 * 60)
         is_admin = name["is_admin"]
         res.set_cookie('is_admin', str(is_admin), max_age=60 * 60)
         return res
     else:
-        abort(401, jsonify(message='User does not exist'))
+        return jsonify({"status": "failure", "message": "User does not exist"}), 401
+@app.route('/authorized')
+def authorized():
+    return render_template('authorized.html')
+
+@app.route('/login')
+def login():
+    return render_template('login.html')
 
 @app.route('/delete_user', methods = ['DELETE'])
 def delete_user():

@@ -1,10 +1,128 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+<!doctype html>
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="form_auth_block">
+    <div class="form_auth_block_content">
+        <p class="form_auth_block_head_text">Authorization</p>
+        <form class="form_auth_style">
+            <label>Enter your username</label>
+            <input type="text" name="auth_email" placeholder="Enter your username" required>
+            <label>Enter your password</label>
+            <input type="text" name="auth_pass" placeholder="Enter your password" required>
+            <button onclick="submitForm(event)" class="form_auth_button" type="submit" name="form_auth_submit">Log In
+            </button>
+        </form>
+    </div>
+</div>
+<style>
+.form_auth_block{
+  width: 500px;
+  height: 500px;
+  margin: 0 auto;
+  background: url(http://www.dailycompass.org/wp-content/uploads/2013/01/Bubbles.jpg);
+  background-size: cover;
+  border-radius: 4px;
+}
+.form_auth_block_content{
+padding-top: 15%;
+}
+.form_auth_block_head_text{
+  display: block;
+  text-align: center;
+  padding: 10px;
+  font-size: 20px;
+  font-weight: 600;
+  background: #ffffff;
+  opacity: 0.7;
+}
+.form_auth_block label{
+  display: block;
+  text-align: center;
+  padding: 10px;
+  background: #ffffff;
+  opacity: 0.7;
+  font-weight: 600;
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+.form_auth_block input{
+display: block;
+margin: 0 auto;
+width: 80%;
+height: 45px;
+border-radius: 10px;
+border:none;
+outline: none;
+}
+input:focus {
+color: #000000;
+border-radius: 10px;
+border: 2px solid #436fea;
+}
+.form_auth_button{
+  display: block;
+  width: 80%;
+  margin: 0 auto;
+  margin-top: 10px;
+  border-radius: 10px;
+  height: 35px;
+  border: none;
+  cursor: pointer;
+}
+::-webkit-input-placeholder {color:#3f3f44; padding-left: 10px;} // Это стили для placeholder
+::-moz-placeholder          {color:#3f3f44; padding-left: 10px;} // Это стили для placeholder
+:-moz-placeholder           {color:#3f3f44; padding-left: 10px;} // Это стили для placeholder
+:-ms-input-placeholder      {color:#3f3f44; padding-left: 10px;} // Это стили для placeholder
+
+
+
+</style>
+
+<script>
+  async function submitForm(event) {
+  const emailInput = document.querySelector("input[name='auth_email']");
+  const passwordInput = document.querySelector("input[name='auth_pass']");
+
+  try {
+      const response = await fetch('/authorize', {
+      method: 'POST',
+      headers: {
+      'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+      username: emailInput.value,
+      password: passwordInput.value,
+  }),
+});
+
+      const jsonResponse = await response.json();
+
+        if (jsonResponse.status === "failure") {
+            alert(jsonResponse.message);
+        } else {
+            window.location.href = jsonResponse.redirect_url;
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+   function sendDataCallback() {
+      // Check response is ready or not
+      if (xhr.readyState == 4 && xhr.status == 201) {
+          console.log("Data creation response received!");
+          getDate();
+          dataDiv = document.getElementById('sent-data-container');
+          // Set current data text
+          dataDiv.innerHTML = xhr.responseText;
+      }
+  }
+
+
+
+
+
+
+</script>
+{% endblock %}
