@@ -7,7 +7,7 @@ from bson import json_util
 
 app = flask.Flask(__name__)
 
-app.config["MONGO_URI"] = "mongodb+srv://engaezik:ozOlNDhqiyCzT0XL@cluster0.goiqv0u.mongodb.net/shop?retryWrites=true&w=majority"
+app.config["MONGO_URI"] = "mongodb+srv://engaezik:VIhnaEMjNuBbNSQw@cluster0.goiqv0u.mongodb.net/shop?retryWrites=true&w=majority"
 
 mongodb_client = PyMongo(app)
 db = mongodb_client.db
@@ -66,22 +66,24 @@ def create_item():
         db.items.insert_one(items)
     return jsonify(message="success")
 
-@app.route('/authorize')
+@app.route('/authorize', methods = ['GET', 'POST'])
 def authorize():
-    username = request.args['username']
-    password = request.args['password']
-    redirect_uri = request.args.get('redirect', '/')
+    username = request.json['username']
+    password = request.json['password']
+    redirect_uri = request.json.get('redirect', '/')
 
     name = db.users.find_one({"username": username, "password": password})
 
     if name:
-        res = make_response(jsonify({"status": "success", "redirect_url": authorized()}))
+        res = make_response(jsonify({"status": "success", "redirect_url": redirect_uri}))
         res.set_cookie('username', username, max_age=60 * 60)
         is_admin = name["is_admin"]
         res.set_cookie('is_admin', str(is_admin), max_age=60 * 60)
         return res
     else:
         return jsonify({"status": "failure", "message": "User does not exist"}), 401
+
+
 @app.route('/authorized')
 def authorized():
     return render_template('authorized.html')
